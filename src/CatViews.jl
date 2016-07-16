@@ -9,6 +9,15 @@ immutable CatView{T<:Number,N} <: AbstractArray{T,1}
     len::NTuple{N,Integer}
 end
 
+@inline CatView{T}(a::AbstractVector{T}...) = CatView(a)
+
+@generated function CatView{N,T}(arr::NTuple{N,AbstractArray{T}})
+  quote
+  len = @ntuple $N (n)->length(arr[n])
+  CatView{T,N}(arr,len)
+  end
+end
+
 Base.size(A::CatView) = (sum(A.len),)
 
 # TODO: Base.@propagate_inbounds ?
@@ -43,17 +52,5 @@ function Base.setindex!(A::CatView, val, i::Int)
         end
     end   
 end
-
-@inline function CatView{T}(a::AbstractVector{T}...)
-    CatView(a)
-end
-
-@generated function CatView{N,T}(arr::NTuple{N,AbstractArray{T}})
-  quote
-  len = @ntuple $N (n)->length(arr[n])
-  CatView{T,N}(arr,len)
-  end
-end
-
 
 end # module
