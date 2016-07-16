@@ -35,3 +35,13 @@ randn!(x)
 c = vcat(a[:,2],b[:,3])
 A = randn(19,19)
 @test isapprox(A*c,A*x)
+
+## Test other constructors
+x = CatView([1,2,3,4],[5,6,7,8])
+x = CatView(x,[9,10,11,12])
+@test length(x) == 12
+[ @test x[i] == i for i in 1:length(x) ]
+
+y = CatView([1,2,3,4],[5,6,7,8],[9,10,11,12])
+@test length(y) == 12
+[ @test y[i] == i for i in 1:length(y) ]

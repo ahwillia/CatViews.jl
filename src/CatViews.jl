@@ -44,20 +44,8 @@ function Base.setindex!(A::CatView, val, i::Int)
     end   
 end
 
-function CatView{T}(a::AbstractVector{T})
-    CatView((a,),(length(a),))
-end
-
-function CatView{T}(a::AbstractVector{T},b::AbstractVector{T})
-    CatView((a,b),(length(a),length(b)))
-end
-
-function CatView{T,N}(
-        a::NTuple{N,AbstractVector{T}},
-        b::AbstractVector{T}
-    )
-
-    CatView((a,b),(length(a),length(b)))
+@inline function CatView{T}(a::AbstractVector{T}...)
+    CatView(a)
 end
 
 @generated function CatView{N,T}(arr::NTuple{N,AbstractArray{T}})
