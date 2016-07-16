@@ -1,3 +1,5 @@
+__precompile__()
+
 module CatViews
 
 using Base.Cartesian
