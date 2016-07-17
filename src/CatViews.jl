@@ -1,28 +1,40 @@
-__precompile__()
+#__precompile__()
 
 module CatViews
 
 using Base.Cartesian
+import Iterators: chain, repeated
 
 export CatView
 
-immutable CatView{T<:Number,N} <: AbstractArray{T,1}
-    arr::NTuple{N,AbstractVector{T}}
+immutable CatView{N,T<:Number} <: AbstractArray{T,1}
+    arr::NTuple{N,SubArray{T}}
     len::NTuple{N,Integer}
+    inner::NTuple{N}  # iterators for each array
+    # outer::UnitRange            # iterators over all subarrays
 end
 
-@inline CatView{T}(a::AbstractVector{T}...) = CatView(a)
+## Constructors ##
+@inline CatView(a::AbstractVector...) = CatView(a)
+
+@generated function CatView{N,T}(arr::NTuple{N,SubArray{T}})
+    quote
+    len = @ntuple $N (n)->length(arr[n])
+    inner = @ntuple $N (n)->eachindex(arr[n])
+    CatView{N,T}(arr,len,inner)
+    end
+end
 
 @generated function CatView{N,T}(arr::NTuple{N,AbstractArray{T}})
-  quote
-  len = @ntuple $N (n)->length(arr[n])
-  CatView{T,N}(arr,len)
-  end
+    quote
+    CatView(@ntuple $N (n)->view(arr[n],:))
+    end
 end
 
+## size ##
 Base.size(A::CatView) = (sum(A.len),)
 
-# TODO: Base.@propagate_inbounds ?
+## get index and set index ##
 
 function Base.getindex(A::CatView, i::Int)
     i < 1 || i > length(A) && throw(BoundsError("index out of bounds."))
@@ -55,4 +67,23 @@ function Base.setindex!(A::CatView, val, i::Int)
     end   
 end
 
-end # module
+function Base.getindex(A::CatView, idx::Tuple{Integer,Integer})
+    i,j = idx
+    return A.arr[i][j]
+end
+
+function Base.setindex!(A::CatView, val, idx::Tuple{Integer,Integer})
+    i,j = idx
+    return setindex!(A.arr[i], val, j)
+end
+
+## Fast iteration ##
+@generated function Base.eachindex{N,T}(A::CatView{N,T})
+    quote
+    @nexprs $N (n)->(i_n = zip(repeated(n,length(A.arr[n])),eachindex(A.arr[n])))
+    chain( (@ntuple $N (n)->i_n)... )
+    end
+end
+
+# end module
+end
