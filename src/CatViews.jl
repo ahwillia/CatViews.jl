@@ -11,7 +11,6 @@ immutable CatView{N,T<:Number} <: AbstractArray{T,1}
     arr::NTuple{N,SubArray{T}}
     len::NTuple{N,Integer}
     inner::NTuple{N}  # iterators for each array
-    # outer::UnitRange            # iterators over all subarrays
 end
 
 ## Constructors ##

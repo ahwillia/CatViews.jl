@@ -2,8 +2,8 @@ using CatViews
 import Base.LinAlg: axpy!
 
 # data params
-m,n = 10,5      # dimensions
-r = 2           # rank
+m,n = 1000,500  # dimensions
+r = 5           # rank
 ξ = 1e-4        # noise level
 
 # True loadings and components

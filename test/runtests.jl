@@ -45,3 +45,7 @@ x = CatView(x,[9,10,11,12])
 y = CatView([1,2,3,4],[5,6,7,8],[9,10,11,12])
 @test length(y) == 12
 [ @test y[i] == i for i in 1:length(y) ]
+
+## Iteration
+x = CatView([1,2],[3,4])
+@test all(x .== [1,2,3,4])
