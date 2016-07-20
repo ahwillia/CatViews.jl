@@ -14,7 +14,7 @@ immutable CatView{N,T<:Number} <: AbstractArray{T,1}
 end
 
 ## Constructors ##
-@inline CatView(a::AbstractVector...) = CatView(a)
+@inline CatView(a::AbstractArray...) = CatView(a)
 
 @generated function CatView{N,T}(arr::NTuple{N,SubArray{T}})
     quote
