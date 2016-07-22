@@ -49,3 +49,15 @@ y = CatView([1,2,3,4],[5,6,7,8],[9,10,11,12])
 ## Iteration
 x = CatView([1,2],[3,4])
 @test all(x .== [1,2,3,4])
+
+## vecmats
+x,(A,B) = vecmats(Int64,(2,3),(4,5))
+@test length(x) == 26
+@test size(A) == (2,3)
+@test size(B) == (4,5)
+[ x[i] = i for i = 1:6 ]
+@test A[1,1] == 1
+@test A[2,1] == 2
+@test A[2,3] == 6
+[ B[i] = i for i in eachindex(B) ]
+[ @test x[i+6] == i for i in 1:6 ]
