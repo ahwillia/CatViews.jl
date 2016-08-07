@@ -4,6 +4,7 @@ module CatViews
 
 using Base.Cartesian
 import Iterators: chain, repeated
+import Compat: view
 
 export CatView, vecmats
 
