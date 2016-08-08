@@ -1,4 +1,4 @@
-#__precompile__()
+__precompile__()
 
 module CatViews
 
@@ -6,10 +6,10 @@ using Base.Cartesian
 import Iterators: chain, repeated
 import Compat: view
 
-export CatView, vecmats
+export CatView, splitview
 
 include("catview.jl")
-include("vecmats.jl")
+include("splitview.jl")
 
 # end module
 end
