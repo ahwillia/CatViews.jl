@@ -76,4 +76,8 @@ end
         @test B[i] == 6+i
     end
     @test y == [13,14,15]
+
+    x = collect(1:8)
+    (A,B),y = splitview(x,(2,2),(2,2))
+    @test isempty(y)
 end
