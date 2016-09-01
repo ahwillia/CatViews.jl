@@ -1,7 +1,6 @@
 using CatViews
 using Base.Test
 
-## Basic functions ##
 @testset "CatView tests" begin
     x = CatView([1,2,3,4],[5,6,7,8])
 
@@ -53,31 +52,81 @@ using Base.Test
 end
 
 @testset "splitview tests" begin
-    ## splitview
-    x,(A,B) = splitview(Int64,(2,3),(4,5))
-    @test length(x) == 26
-    @test size(A) == (2,3)
-    @test size(B) == (4,5)
-    [ x[i] = i for i = 1:6 ]
-    @test A[1,1] == 1
-    @test A[2,1] == 2
-    @test A[2,3] == 6
-    [ B[i] = i for i in eachindex(B) ]
-    [ @test x[i+6] == i for i in 1:6 ]
+    @testset "without preallocation" begin
 
-    ## splitview
-    x = collect(1:15)
-    (A,B),y = splitview(x,(2,3),(3,2))
+        x,(A,B),s,e = splitview(Int64,(2,3),(4,5))
+        
+        # test sizes
+        @test length(x) == 26
+        @test size(A) == (2,3)
+        @test size(B) == (4,5)
+        @test eltype(A) == Int64
+        @test eltype(B) == Int64
 
-    @test size(A) == (2,3)
-    @test size(B) == (3,2)
-    for i = 1:6
-        @test A[i] == i
-        @test B[i] == 6+i
+        # test partititions between vectors
+        @test s == (1,7)
+        @test e == (6,26)
+
+        # set A to 1:6 by mutating x
+        [ x[i] = i for i = s[1]:e[1] ]
+        @test all(A == [1 3 5; 2 4 6])
+
+        # set B to 1:20 by mutating it directly
+        [ B[i] = i for i in 1:length(B) ]
+        [ @test x[i+6] == i for i in 1:20 ]
+
+        # test on a higher-order array
+        sz1 = (2,2,2)
+        sz2 = (2,3,2)
+        sz3 = (3,2,2)
+        x,(A,B,C),s,e = splitview(Int64,sz1,sz2,sz3)
+
+        @test size(A) == sz1
+        @test size(B) == sz2
+        @test size(C) == sz3
+        @test s == (1, length(A)+1, length(A)+length(B)+1)
+        @test e == (length(A), length(A)+length(B), length(A)+length(B)+length(C))
     end
-    @test y == [13,14,15]
 
-    x = collect(1:8)
-    (A,B),y = splitview(x,(2,2),(2,2))
-    @test isempty(y)
+    @testset "with preallocation" begin
+        
+        # preallocate x
+        x = collect(1:26)
+        (A,B),s,e = splitview(x,(2,3),(4,5))
+
+        #test sizes 
+        @test size(A) == (2,3)
+        @test size(B) == (4,5)
+        @test s == (1,7)
+        @test e == (6,26)
+
+        # test that A and B faithfully view into x
+        for i = 1:6
+            @test A[i] == i
+            @test B[i] == 6+i
+        end
+
+        # test on higher-order array
+        sz1 = (2,2,2)
+        sz2 = (2,3,2)
+        sz3 = (3,2,2)
+        N = prod(sz1)+prod(sz2)+prod(sz3)
+        x = collect(1:N)
+        (A,B,C),s,e = splitview(x,sz1,sz2,sz3)
+
+        @test eltype(A) == Int
+        @test size(A) == sz1
+        @test size(B) == sz2
+        @test size(C) == sz3
+        @test s == (1, length(A)+1, length(A)+length(B)+1)
+        @test e == (length(A), length(A)+length(B), length(A)+length(B)+length(C))
+
+        # test that arrays correctly hold 1:N
+        for (i,j,X) in zip(s,e,(A,B,C))
+            for (xi,Xi) in zip(i:j,eachindex(X))
+                @test x[xi] == X[Xi] == xi
+            end
+        end
+
+    end
 end
