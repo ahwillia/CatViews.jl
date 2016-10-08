@@ -3,9 +3,10 @@ __precompile__()
 module CatViews
 
 using Base.Cartesian
+import Base.ReshapedArray
 import Iterators: chain, repeated
 
-export CatView, splitview
+export CatView, splitview, vecidx
 
 include("catview.jl")
 include("splitview.jl")

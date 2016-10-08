@@ -24,3 +24,22 @@ end
       return X,start,stop
     end
 end
+
+# unexported from Base
+typealias FastContiguousSubArray{T,N,P,I<:Tuple{Union{Colon, UnitRange}, Vararg{Any}}} SubArray{T,N,P,I,true}
+
+parentindex(A::FastContiguousSubArray, i::Int) = A.offset1 + i
+parentindex(A::FastContiguousSubArray, i::Int...) = A.offset1 + prod(i)
+parentindex{N}(A::FastContiguousSubArray, i::NTuple{N,Int}) = A.offset1 + prod(i)
+
+@inline parentindex(A::ReshapedArray, i::Int...) = sub2ind(size(A), i...)
+parentindex{N}(A::ReshapedArray, i::NTuple{N,Int}) = sub2ind(size(A), i...)
+
+vecidx(A::Array, i::Int) = i
+
+vecidx(A::FastContiguousSubArray, i::Int) = vecidx(A.parent, parentindex(A, i))
+@inline vecidx(A::FastContiguousSubArray, i::Int...) = vecidx(A.parent, parentindex(A, i...))
+vecidx{N}(A::FastContiguousSubArray, i::NTuple{N,Int}) = vecidx(A.parent, parentindex(A, i))
+
+@inline vecidx(A::ReshapedArray, i::Int...) = vecidx(A.parent, parentindex(A, i...))
+vecidx{N}(A::ReshapedArray, i::NTuple{N,Int}) = vecidx(A.parent, parentindex(A, i))

@@ -10,7 +10,7 @@ In optimization and machine learning, model parameters can be distributed across
 However, it can be useful to abstract away these details (e.g. when computing gradients) and collect all the parameters into a single vector.
 This is a lightweight package that enables you to switch between these two perspectives seemlessly.
 
-CatViews exports two things:
+CatViews exports two main things:
 
 * **`CatView`** - An array that can represent a sequence of preallocated arrays within a vector. 
 * **`splitview`** - A function that produces a sequence of new arrays as views into a vector.
@@ -48,6 +48,24 @@ x[s[1]:e[1]] .== vec(A)
 x[s[2]:e[2]] .== vec(B)
 x[s[3]:e[3]] .== vec(C)
 ```
+
+#### Use `vecidx` to get the index into the parent array
+
+CatViews also exports a simple function that allows you to match indices between the parameter vector and the reshaped matrices:
+
+```julia
+x,(A,B) = splitview((2,3),(3,2))
+
+# fill x with random numbers
+randn!(x)
+
+i = vecidx(A,2,1) # i == 2
+x[i] == A[2,1]
+
+j = vecidx(B,(3,2)) # j == 12
+x[j] == B[3,2]
+```
+
 
 ### `CatView` documentation
 
