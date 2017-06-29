@@ -26,7 +26,7 @@ end
 end
 
 # unexported from Base
-typealias FastContiguousSubArray{T,N,P,I<:Tuple{Union{Colon, UnitRange}, Vararg{Any}}} SubArray{T,N,P,I,true}
+FastContiguousSubArray{T,N,P,I<:Tuple{Union{Colon, UnitRange}, Vararg{Any}}} = SubArray{T,N,P,I,true}
 
 parentindex(A::FastContiguousSubArray, i::Int) = A.offset1 + i
 parentindex(A::FastContiguousSubArray, i::Int...) = A.offset1 + prod(i)
