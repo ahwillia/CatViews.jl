@@ -4,7 +4,7 @@ module CatViews
 
 using Base.Cartesian
 import Base.ReshapedArray
-import Iterators: chain, repeated
+import IterTools: chain, repeated
 
 export CatView, splitview, vecidx
 
