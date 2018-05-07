@@ -1,7 +1,7 @@
 # CatViews
 
 [![Build Status](https://travis-ci.org/ahwillia/CatViews.jl.svg?branch=master)](https://travis-ci.org/ahwillia/CatViews.jl)
-[![CatViews](http://pkg.julialang.org/badges/CatViews_0.7.svg)](http://pkg.julialang.org/?pkg=CatViews)
+[![CatViews](http://pkg.julialang.org/badges/CatViews_0.6.svg)](http://pkg.julialang.org/?pkg=CatViews)
 [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE.md)
 
 <img src="http://i.imgur.com/OHtZ2HZ.jpg" width="300px">
