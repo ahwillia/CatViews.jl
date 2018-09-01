@@ -24,7 +24,7 @@ In general, you should use `splitview` when you know the array shapes beforehand
 In the following example, we create two matrices `A` and `B` that are linked to a parameter vector `x`.
 
 ```julia
-x,(A,B) = splitview((2, 3), (3, 2))
+x, (A, B) = splitview((2, 3), (3, 2))
 
 # mutating x updates A and B
 x[1:6] = 1:6
