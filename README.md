@@ -55,16 +55,16 @@ x[s[3]:e[3]] .== vec(C)
 CatViews also exports a simple function that allows you to match indices between the parameter vector and the reshaped matrices:
 
 ```julia
-x,(A,B) = splitview((2,3),(3,2))
+x, (A, B) = splitview((2, 3), (3, 2))
 
 # fill x with random numbers
 randn!(x)
 
-i = vecidx(A,2,1) # i == 2
-x[i] == A[2,1]
+i = vecidx(A, 2, 1) # i == 2
+x[i] == A[2, 1]
 
-j = vecidx(B,(3,2)) # j == 12
-x[j] == B[3,2]
+j = vecidx(B,(3, 2)) # j == 12
+x[j] == B[3, 2]
 ```
 
 
@@ -73,29 +73,29 @@ x[j] == B[3,2]
 Suppose we have `A` and `B` already preallocated, and we want to represent them as a parameter vector `x`:
 
 ```julia
-A = randn(10,10);   # imagine this is a large matrix so copying is really undesirable
-B = randn(10,10);   # imagine this is also large so copying totally sucks
-a = view(A,:);      # vector view of A, no copying
-b = view(B,:);      # vector view of B, no copying
-x = vcat(a,b);      # ACK!! causes copying!!
-typeof(x)           # returns Array, rather than SubArray
+A = randn(10, 10);   # imagine this is a large matrix so copying is really undesirable
+B = randn(10, 10);   # imagine this is also large so copying totally sucks
+a = view(A, :);      # vector view of A, no copying
+b = view(B, :);      # vector view of B, no copying
+x = vcat(a, b);      # ACK!! causes copying!!
+typeof(x)            # returns Array, rather than SubArray
 ```
 
 Furthermore, if you mutate `x` in this example, the chances aren't automatically reflected in `A` and `B`.
 
 ```julia
-A = randn(10,10);
-B = randn(10,10);
-a = view(A,:);      # no copying
-b = view(B,:);      # no copying
-x = CatView(a,b);   # no copying!!!
+A = randn(10, 10);
+B = randn(10, 10);
+a = view(A, :);      # no copying
+b = view(B, :);      # no copying
+x = CatView(a, b);   # no copying!!!
 ```
 
 You can treat `x` as you would any other vector in Julia! Like `splitview`, mutating `x` will also update `A` and `B`:
 
 ```julia
 x[1:3] = 999
-@show A[1:4,1:4]
+@show A[1:4, 1:4]
 ```
 
 ```
