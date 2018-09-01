@@ -40,6 +40,7 @@ Reshaping a view does not causing copying in Julia as of v0.5
 You can also get a list of the indices in `x` that represent the start and end of the arrays:
 
 ```julia
+using Random: randn!
 x,(A,B,C),s,e = splitview((3,3),(3,3),(3,3,3))
 for X in (A,B,C)
   randn!(X)

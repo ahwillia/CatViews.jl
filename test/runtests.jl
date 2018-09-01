@@ -1,5 +1,6 @@
 using CatViews
-using Base.Test
+using Test
+using Random: randn!
 
 @testset "CatView tests" begin
     x = CatView([1,2,3,4],[5,6,7,8])
@@ -134,7 +135,7 @@ end
 @testset "indexing" begin
 
     x,children, = splitview(Int64,(3,3),(2,2,2,2,2,2),(4,5,2),(10,),(1,10),(3,3))
-    copy!(x,1:length(x))
+    copyto!(x,1:length(x))
 
     for child in children
         for child_idx = eachindex(child)
@@ -146,7 +147,7 @@ end
     for child in children
         d = size(child)
         for i = 1:prod(d)
-            idx = ind2sub(d,i)
+            idx = Tuple(CartesianIndices(d)[i])
             pi1 = vecidx(child, idx)
             pi2 = vecidx(child, idx...)
             @test x[pi1] == x[pi2] == child[idx...] == child[i]

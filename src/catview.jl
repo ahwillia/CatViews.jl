@@ -1,4 +1,4 @@
-immutable CatView{N,T<:Number} <: AbstractArray{T,1}
+struct CatView{N,T<:Number} <: AbstractArray{T,1}
     arr::NTuple{N,SubArray{T}}
     len::NTuple{N,Integer}
     inner::NTuple{N}  # iterators for each array
@@ -7,7 +7,7 @@ end
 ## Constructors ##
 @inline CatView(a::AbstractArray...) = CatView(a)
 
-@generated function CatView{N,T}(arr::NTuple{N,SubArray{T}})
+@generated function CatView(arr::NTuple{N,SubArray{T}}) where {N,T}
     quote
     len = @ntuple $N (n)->length(arr[n])
     inner = @ntuple $N (n)->eachindex(arr[n])
@@ -15,7 +15,7 @@ end
     end
 end
 
-@generated function CatView{N,T}(arr::NTuple{N,AbstractArray{T}})
+@generated function CatView(arr::NTuple{N,AbstractArray{T}}) where {N,T}
     quote
     CatView(@ntuple $N (n)->view(arr[n],:))
     end
@@ -68,9 +68,9 @@ function Base.setindex!(A::CatView, val, idx::Tuple{Integer,Integer})
 end
 
 ## Fast iteration ##
-@generated function Base.eachindex{N,T}(A::CatView{N,T})
+@generated function Base.eachindex(A::CatView{N,T}) where {N,T}
     quote
     @nexprs $N (n)->(i_n = zip(repeated(n,length(A.arr[n])),eachindex(A.arr[n])))
-    chain( (@ntuple $N (n)->i_n)... )
+    flatten( (@ntuple $N (n)->i_n) )
     end
 end
