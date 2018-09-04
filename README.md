@@ -80,7 +80,7 @@ x = vcat(a, b);      # ACK!! causes copying!!
 typeof(x)            # returns Array, rather than SubArray
 ```
 
-Furthermore, if you mutate `x` in this example, the chances aren't automatically reflected in `A` and `B`.
+Furthermore, if you mutate `x` in this example, the changes aren't automatically reflected in `A` and `B`.
 
 ```julia
 A = randn(10, 10);
