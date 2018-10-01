@@ -9,7 +9,7 @@ end
 @generated function CatView(arr::NTuple{N,SubArray{T}}) where {N,T}
     quote
     len = @ntuple $N (n)->length(arr[n])
-    CatView{N,T}(arr,len,inner)
+    CatView{N,T}(arr,len)
     end
 end
 
