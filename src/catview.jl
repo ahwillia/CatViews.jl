@@ -1,7 +1,6 @@
 struct CatView{N,T<:Number} <: AbstractArray{T,1}
     arr::NTuple{N,SubArray{T}}
     len::NTuple{N,Integer}
-    inner::NTuple{N}  # iterators for each array
 end
 
 ## Constructors ##
@@ -10,7 +9,6 @@ end
 @generated function CatView(arr::NTuple{N,SubArray{T}}) where {N,T}
     quote
     len = @ntuple $N (n)->length(arr[n])
-    inner = @ntuple $N (n)->eachindex(arr[n])
     CatView{N,T}(arr,len,inner)
     end
 end
@@ -38,7 +36,7 @@ function Base.getindex(A::CatView, i::Int)
             a = b
             b = b + A.len[j+1]
         end
-    end   
+    end
 end
 
 function Base.setindex!(A::CatView, val, i::Int)
