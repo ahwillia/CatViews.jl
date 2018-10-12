@@ -6,8 +6,6 @@ end
 ## Constructors ##
 @inline CatView(a::AbstractVector...) = CatView(tuple(a...))
 
-
-
 @generated function CatView(arr::NR) where NR<:Tuple
     N = length(NR.parameters)
     array_types = eltype(NR)
@@ -30,7 +28,7 @@ function Base.getindex(A::CatView, i::Int)
 
     a = 0
     b = A.len[1]
-    for j = 1:length(A.len)
+    @inbounds for j = 1:length(A.len)
         if i <= b
             return A.arr[j][i-a]
         else
@@ -45,7 +43,7 @@ function Base.setindex!(A::CatView, val, i::Int)
 
     a = 0
     b = A.len[1]
-    for j = 1:length(A.len)
+    @inbounds for j = 1:length(A.len)
         if i <= b
             A.arr[j][i-a] = val
             return val
@@ -56,11 +54,13 @@ function Base.setindex!(A::CatView, val, i::Int)
     end   
 end
 
+#Base.@propagate_inbounds 
 function Base.getindex(A::CatView, idx::Tuple{Integer,Integer})
     i,j = idx
     return A.arr[i][j]
 end
 
+#Base.@propagate_inbounds
 function Base.setindex!(A::CatView, val, idx::Tuple{Integer,Integer})
     i,j = idx
     return setindex!(A.arr[i], val, j)
@@ -72,4 +72,9 @@ end
     @nexprs $N (n)->(i_n = zip(repeated(n,length(A.arr[n])),eachindex(A.arr[n])))
     flatten( (@ntuple $N (n)->i_n) )
     end
+end
+
+
+function Base.mapreduce(f, op, A::CatView)
+	reduce(op, mapreduce(f, op, aa) for aa in A.arr)
 end

@@ -93,7 +93,7 @@ x = CatView(a, b);   # no copying!!!
 You can treat `x` as you would any other vector in Julia! Like `splitview`, mutating `x` will also update `A` and `B`:
 
 ```julia
-x[1:3] = 999
+x[1:3] .= 999
 @show A[1:4, 1:4]
 ```
 
