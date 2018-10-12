@@ -155,3 +155,12 @@ end
     end
 
 end
+
+
+@testset "mapreduce" begin
+    orig = collect(1:100)
+    xs = CatView(orig[21:80], orig[1:20], orig[81:end])
+
+    @test mapreduce(x->2x, +, xs) ==  sum(2*orig)
+    @test sum(xs) == sum(orig)
+end

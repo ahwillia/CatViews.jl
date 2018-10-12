@@ -1,7 +1,6 @@
 struct CatView{N,T<:Number} <: AbstractArray{T,1}
     arr::NTuple{N,SubArray{T}}
     len::NTuple{N,Integer}
-    inner::NTuple{N}  # iterators for each array
 end
 
 ## Constructors ##
@@ -10,8 +9,7 @@ end
 @generated function CatView(arr::NTuple{N,SubArray{T}}) where {N,T}
     quote
     len = @ntuple $N (n)->length(arr[n])
-    inner = @ntuple $N (n)->eachindex(arr[n])
-    CatView{N,T}(arr,len,inner)
+    CatView{N,T}(arr,len)
     end
 end
 
@@ -31,14 +29,14 @@ function Base.getindex(A::CatView, i::Int)
 
     a = 0
     b = A.len[1]
-    for j = 1:length(A.len)
+    @inbounds for j = 1:length(A.len)
         if i <= b
             return A.arr[j][i-a]
         else
             a = b
             b = b + A.len[j+1]
         end
-    end   
+    end
 end
 
 function Base.setindex!(A::CatView, val, i::Int)
@@ -46,7 +44,7 @@ function Base.setindex!(A::CatView, val, i::Int)
 
     a = 0
     b = A.len[1]
-    for j = 1:length(A.len)
+    @inbounds for j = 1:length(A.len)
         if i <= b
             A.arr[j][i-a] = val
             return val
@@ -57,11 +55,13 @@ function Base.setindex!(A::CatView, val, i::Int)
     end   
 end
 
+#Base.@propagate_inbounds 
 function Base.getindex(A::CatView, idx::Tuple{Integer,Integer})
     i,j = idx
     return A.arr[i][j]
 end
 
+#Base.@propagate_inbounds
 function Base.setindex!(A::CatView, val, idx::Tuple{Integer,Integer})
     i,j = idx
     return setindex!(A.arr[i], val, j)
@@ -73,4 +73,9 @@ end
     @nexprs $N (n)->(i_n = zip(repeated(n,length(A.arr[n])),eachindex(A.arr[n])))
     flatten( (@ntuple $N (n)->i_n) )
     end
+end
+
+
+function Base.mapreduce(f, op, A::CatView)
+	reduce(op, mapreduce(f, op, aa) for aa in A.arr)
 end
