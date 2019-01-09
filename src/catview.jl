@@ -1,21 +1,20 @@
-struct CatView{N,T<:Number} <: AbstractArray{T,1}
-    arr::NTuple{N,SubArray{T}}
-    len::NTuple{N,Integer}
+struct CatView{N, T, NR} <: AbstractVector{T}
+    arr::NR
+    len::NTuple{N,Int}
 end
 
 ## Constructors ##
-@inline CatView(a::AbstractArray...) = CatView(a)
+@inline CatView(a::AbstractVector...) = CatView(tuple(a...))
 
-@generated function CatView(arr::NTuple{N,SubArray{T}}) where {N,T}
+@generated function CatView(arr::NR) where NR<:Tuple
+    N = length(NR.parameters)
+    array_types = eltype(NR)
+    array_types <: AbstractVector || throw(DomainError(array_types, "CatView is only valid on AbstractVectors."))
+    T = eltype(array_types)
+    
     quote
     len = @ntuple $N (n)->length(arr[n])
-    CatView{N,T}(arr,len)
-    end
-end
-
-@generated function CatView(arr::NTuple{N,AbstractArray{T}}) where {N,T}
-    quote
-    CatView(@ntuple $N (n)->view(arr[n],:))
+    CatView{$N, $T, $NR}(arr, len)
     end
 end
 
