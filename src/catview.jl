@@ -11,7 +11,7 @@ end
     array_types = eltype(NR)
     array_types <: AbstractVector || throw(DomainError(array_types, "CatView is only valid on AbstractVectors."))
     T = eltype(array_types)
-    
+
     quote
     len = @ntuple $N (n)->length(arr[n])
     CatView{$N, $T, $NR}(arr, len)
@@ -51,10 +51,10 @@ function Base.setindex!(A::CatView, val, i::Int)
             a = b
             b = b + A.len[j+1]
         end
-    end   
+    end
 end
 
-#Base.@propagate_inbounds 
+#Base.@propagate_inbounds
 function Base.getindex(A::CatView, idx::Tuple{Integer,Integer})
     i,j = idx
     return A.arr[i][j]
@@ -76,5 +76,5 @@ end
 
 
 function Base.mapreduce(f, op, A::CatView)
-	reduce(op, mapreduce(f, op, aa) for aa in A.arr)
+    reduce(op, mapreduce(f, op, aa) for aa in A.arr)
 end
