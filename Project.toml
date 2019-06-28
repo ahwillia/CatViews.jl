@@ -2,7 +2,7 @@ name = "CatViews"
 uuid = "81a5f4ea-a946-549a-aa7e-2a7f63a27d31"
 
 [compat]
-julia = "≥ 0.7.0"
+julia = "0.7, 1"
 
 [extras]
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
