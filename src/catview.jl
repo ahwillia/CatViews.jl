@@ -1,25 +1,27 @@
-struct CatView{N, T, NR} <: AbstractVector{T}
+struct CatView{N,T,NR} <: AbstractVector{T}
     arr::NR
     len::NTuple{N,Int}
+    clen::Int
 end
 
 ## Constructors ##
 @inline CatView(a::AbstractVector...) = CatView(tuple(a...))
 
-@generated function CatView(arr::NR) where NR<:Tuple
+@generated function CatView(arr::NR) where {NR<:Tuple}
     N = length(NR.parameters)
     array_types = eltype(NR)
     array_types <: AbstractVector || throw(DomainError(array_types, "CatView is only valid on AbstractVectors."))
     T = eltype(array_types)
 
     quote
-    len = @ntuple $N (n)->length(arr[n])
-    CatView{$N, $T, $NR}(arr, len)
+        len = @ntuple $N (n) -> length(arr[n])
+        clen = sum(len)
+        CatView{$N,$T,$NR}(arr, len, clen)
     end
 end
 
 ## size ##
-Base.size(A::CatView) = (sum(A.len),)
+Base.size(A::CatView) = (A.clen,)
 
 ## get index and set index ##
 
@@ -56,21 +58,21 @@ end
 
 #Base.@propagate_inbounds
 function Base.getindex(A::CatView, idx::Tuple{Integer,Integer})
-    i,j = idx
+    i, j = idx
     return A.arr[i][j]
 end
 
 #Base.@propagate_inbounds
 function Base.setindex!(A::CatView, val, idx::Tuple{Integer,Integer})
-    i,j = idx
+    i, j = idx
     return setindex!(A.arr[i], val, j)
 end
 
 ## Fast iteration ##
 @generated function Base.eachindex(A::CatView{N,T}) where {N,T}
     quote
-    @nexprs $N (n)->(i_n = zip(repeated(n,length(A.arr[n])),eachindex(A.arr[n])))
-    flatten( (@ntuple $N (n)->i_n) )
+        @nexprs $N (n) -> (i_n = zip(repeated(n, length(A.arr[n])), eachindex(A.arr[n])))
+        flatten((@ntuple $N (n) -> i_n))
     end
 end
 
